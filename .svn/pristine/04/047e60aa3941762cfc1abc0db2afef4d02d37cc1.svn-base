@@ -1,0 +1,71 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using KioskManagement.Data.Migrations;
+using KioskManagement.Model.Models;
+using KioskManagement.Model.MappingModels;
+using KioskManagement.Model.ViewModels;
+
+namespace KioskManagement.Data
+{
+    public class AIOAcessContolDbContext : IdentityDbContext<IdentityUser>
+    {
+        //public AIOAcessContolDbContext()
+        //{
+        //    this.Database.Migrate();
+        //}
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //}
+
+        public AIOAcessContolDbContext(DbContextOptions<AIOAcessContolDbContext> options) : base(options)
+        {
+            this.Database.SetCommandTimeout(0);
+        }
+
+        public virtual DbSet<AppGroup> AppGroups { get; set; }
+        public virtual DbSet<AppMenu> AppMenus { get; set; }
+        public virtual DbSet<AppMenuUser> AppMenuUsers { get; set; }
+        public virtual DbSet<AppRole> AppRoles { get; set; }
+        public virtual DbSet<AppRoleGroup> AppRoleGroups { get; set; }
+        public virtual DbSet<AppUser> AppUsers { get; set; }
+        public virtual DbSet<AppUserGroup> AppUserGroups { get; set; }
+        public virtual DbSet<AppUserRole> AppUserRoles { get; set; }
+       
+    
+       
+   
+        
+        public virtual DbSet<AppMenuMappingSQL> GetMenuList { get; set; }
+
+        //map thông kê
+      
+        
+        //end map thống kê
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Server=192.168.10.166;Database=KioskManagement;Trusted_Connection=false;User ID=sa;Password=123456");
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AppMenuUser>().ToTable("AppMenuUsers").HasKey(x => new { x.UserId, x.MenuId });
+            modelBuilder.Entity<AppUserGroup>().ToTable("AppUserGroups").HasKey(x => new { x.UserId, x.GroupId });
+            modelBuilder.Entity<AppRoleGroup>().ToTable("AppRoleGroups").HasKey(x => new { x.RoleId, x.GroupId });
+            modelBuilder.Entity<IdentityUserRole<string>>().ToTable("AppUserRoles").HasKey(i => new { i.UserId, i.RoleId });
+            modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("AppUserLogins").HasKey(i => i.UserId);
+            modelBuilder.Entity<IdentityRole>().ToTable("AppRoles");
+            modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("AppUserClaims").HasKey(i => i.UserId);
+            modelBuilder.Entity<IdentityUserToken<string>>().ToTable("AppUserTokens").HasKey(i => i.UserId);
+            modelBuilder.Entity<IdentityUser<string>>().ToTable("AppUsers").HasKey(i => i.Id);
+            
+            
+
+            
+        }
+    }
+}
